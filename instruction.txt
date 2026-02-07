@@ -1,0 +1,46 @@
+p1:
+    Turn off KVM
+        sudo modprobe -r kvm_intel kvm
+    Start
+        vagrant up
+    Login to vm
+        vagrant ssh ssianS
+        sudo kubectl get nodes -o wide
+        vagrant ssh ssianSW
+    Stop and destroy
+        vagrant halt
+        vagrant vagrant destroy -f
+
+p2:
+    vagrant ssh ssianS
+    sudo kubectl get all -n kube-system
+    sudo kubectl get all
+    curl -H "Host:app1.com" 192.168.56.110
+    curl -H "Host:app2.com" 192.168.56.110
+    curl -H "Host:app3.com" 192.168.56.110
+    sudo kubectl get ingress
+
+p3:
+    run /scripts/setup.sh
+    
+    k3d cluster create mycluster
+    k3d cluster start mycluster
+    k3d cluster stop mycluster
+    k3d cluster delete mycluster
+    
+    kubectl get pods -n dev
+    kubectl get pods -A
+    
+    Port forward from localhost:
+    argocd
+        kubectl port-forward -n argocd svc/argocd-server 8080:443
+
+    app
+        kubectl port-forward -n dev svc/wil-playground-service 8888:8888
+
+    Generate Argo cd admin login password (http://localhost:8080)
+        
+        username: admin
+        password:
+        kubectl -n argocd get secret argocd-initial-admin-secret \
+            -o jsonpath="{.data.password}" | base64 -d && echo
