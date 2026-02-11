@@ -1,4 +1,16 @@
+
+
 p1:
+    install oracle virtual box
+        sudo apt update
+        sudo apt install wget gcc make perl dkms build-essential linux-headers-$(uname -r)
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian <mydist> contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+        sudo apt update
+        sudo apt install virtualbox-7.2
+        sudo usermod -a -G vboxusers $USER
+    install vagrant
+        sudo apt install vagrant
     Turn off KVM
         sudo modprobe -r kvm_intel kvm
     Start
@@ -21,6 +33,11 @@ p2:
     sudo kubectl get ingress
 
 p3:
+    install kubectl
+        curl -LO https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+
     run /scripts/setup.sh
     
     k3d cluster create mycluster
