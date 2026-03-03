@@ -18,10 +18,14 @@ p1:
     Login to vm
         vagrant ssh ssianS
         sudo kubectl get nodes -o wide
+        ifconfig eth1
+        sudo kubectl get nodes (same cluster)
         vagrant ssh ssianSW
+        ifconfig eth1
+        
     Stop and destroy
         vagrant halt
-        vagrant vagrant destroy -f
+        vagrant destroy -f
 
 p2:
     vagrant ssh ssianS
