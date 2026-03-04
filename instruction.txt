@@ -65,6 +65,7 @@ p3:
     kubectl get pods -A
     
     Port forward from localhost:
+    
     argocd
         kubectl port-forward -n argocd svc/argocd-server 8080:443
 
@@ -77,3 +78,4 @@ p3:
         password:
         kubectl -n argocd get secret argocd-initial-admin-secret \
             -o jsonpath="{.data.password}" | base64 -d && echo
+
