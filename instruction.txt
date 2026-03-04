@@ -19,22 +19,34 @@ p1:
         vagrant ssh ssianS
         sudo kubectl get nodes -o wide
         ifconfig eth1
+        hostnamectl
         sudo kubectl get nodes (same cluster)
+        sudo systemctl status k3s
         vagrant ssh ssianSW
         ifconfig eth1
-        
+        hostnamectl
+        sudo systemctl status k3s-agent
     Stop and destroy
         vagrant halt
         vagrant destroy -f
 
 p2:
     vagrant ssh ssianS
+    ifconfig eth1
+    hostnamectl
+    sudo systemctl status k3s
+    sudo kubectl get nodes -o wide
     sudo kubectl get all -n kube-system
     sudo kubectl get all
     curl -H "Host:app1.com" 192.168.56.110
     curl -H "Host:app2.com" 192.168.56.110
     curl -H "Host:app3.com" 192.168.56.110
+    sudo nano /etc/hosts (change local hosts file)
     sudo kubectl get ingress
+    sudo kubectl get deployments
+    sudo kubectl get pods
+    sudo kubectl get svc
+    sudo kubectl get endpoints
 
 p3:
     install kubectl
@@ -44,10 +56,10 @@ p3:
 
     run /scripts/setup.sh
     
-    k3d cluster create mycluster
-    k3d cluster start mycluster
-    k3d cluster stop mycluster
-    k3d cluster delete mycluster
+    k3d cluster create ssian-cluster
+    k3d cluster start ssian-cluster
+    k3d cluster stop ssian-cluster
+    k3d cluster delete ssian-cluster
     
     kubectl get pods -n dev
     kubectl get pods -A
