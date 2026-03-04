@@ -16,34 +16,59 @@ Before starting, ensure you have the following installed on your system:
 
 Part 1 focuses on setting up a K3s cluster with a master (server) node and a worker node using Vagrant and VirtualBox.
 
+### Installation
+
+**Install Oracle VirtualBox:**
+```bash
+sudo apt update
+sudo apt install wget gcc make perl dkms build-essential linux-headers-$(uname -r)
+wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian <mydist> contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+sudo apt update
+sudo apt install virtualbox-7.2
+sudo usermod -a -G vboxusers $USER
+```
+
+**Install Vagrant:**
+```bash
+sudo apt install vagrant
+```
+
+**Turn off KVM (if necessary):**
+```bash
+sudo modprobe -r kvm_intel kvm
+```
+
 ### Setup and Run
 
-1. Navigate to the `p1` directory.
-2. Start the virtual machines:
-   ```bash
-   vagrant up
-   ```
+Start the virtual machines:
+```bash
+vagrant up
+```
 
 ### Validation
 
-You can SSH into the nodes to verify the installation:
-
-**Master Node (ssianS):**
+**Login to Server VM (ssianS):**
 ```bash
 vagrant ssh ssianS
 sudo kubectl get nodes -o wide
+ifconfig eth1
+hostnamectl
+sudo kubectl get nodes
 sudo systemctl status k3s
 ```
 
-**Worker Node (ssianSW):**
+**Login to Worker VM (ssianSW):**
 ```bash
 vagrant ssh ssianSW
+ifconfig eth1
+hostnamectl
 sudo systemctl status k3s-agent
 ```
 
 ### Cleanup
 
-To stop and remove the VMs:
+Stop and destroy the VMs:
 ```bash
 vagrant halt
 vagrant destroy -f
@@ -53,51 +78,57 @@ vagrant destroy -f
 
 Part 2 builds upon the cluster setup to deploy applications and configure Ingress.
 
-### Usage
+### Operations
 
-1. Navigate to the `p2` directory.
-2. Start the environment (if not already running from Part 1 setup, though P2 has its own Vagrantfile):
-   ```bash
-   vagrant up
-   ```
-3. Connect to the server node:
-   ```bash
-   vagrant ssh ssianS
-   ```
-
-### Verification & Testing
-
-Check the status of deployments, services, and ingress:
+**Access Server and Check Status:**
 ```bash
+vagrant ssh ssianS
+ifconfig eth1
+hostnamectl
+sudo systemctl status k3s
+sudo kubectl get nodes -o wide
 sudo kubectl get all -n kube-system
 sudo kubectl get all
-sudo kubectl get ingress
 ```
 
-Test the applications using `curl` with specific Host headers (assuming IP `192.168.56.110`):
+**Test Ingress:**
 ```bash
 curl -H "Host:app1.com" 192.168.56.110
 curl -H "Host:app2.com" 192.168.56.110
 curl -H "Host:app3.com" 192.168.56.110
 ```
 
-*Note: You may need to update your local `/etc/hosts` file for browser access.*
+**Configuration & Inspection:**
+```bash
+sudo nano /etc/hosts  # (change local hosts file)
+sudo kubectl get ingress
+sudo kubectl get deployments
+sudo kubectl get pods
+sudo kubectl get svc
+sudo kubectl get endpoints
+```
 
 ## Part 3: K3d & ArgoCD
 
 Part 3 utilizes `k3d` to create a cluster and implements GitOps using ArgoCD.
 
-### Setup
+### Installation
 
-1. Navigate to the `p3` directory.
-2. Run the setup script:
-   ```bash
-   ./scripts/setup.sh
-   ```
+**Install kubectl:**
+```bash
+curl -LO https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+```
 
-### Cluster Management
+### Setup and Management
 
-Commands to manage the k3d cluster:
+**Run Setup:**
+```bash
+./scripts/setup.sh
+```
+
+**Cluster Commands:**
 ```bash
 k3d cluster create ssian-cluster
 k3d cluster start ssian-cluster
@@ -105,23 +136,27 @@ k3d cluster stop ssian-cluster
 k3d cluster delete ssian-cluster
 ```
 
-### Accessing Services
+**Verification:**
+```bash
+kubectl get pods -n dev
+kubectl get pods -A
+```
 
-**ArgoCD:**
-1. Port forward the ArgoCD server:
-   ```bash
-   kubectl port-forward -n argocd svc/argocd-server 8080:443
-   ```
-2. Access at `http://localhost:8080`.
-3. Username: `admin`
-4. Retrieve the initial password:
-   ```bash
-   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
-   ```
+### Port Forwarding & Access
 
-**Application (Wil Playground):**
-1. Port forward the service:
-   ```bash
-   kubectl port-forward -n dev svc/wil-playground-service 8888:8888
-   ```
-2. Access at `http://localhost:8888`.
+**ArgoCD (http://localhost:8080):**
+```bash
+kubectl port-forward -n argocd svc/argocd-server 8080:443
+```
+
+**Application (http://localhost:8888):**
+```bash
+kubectl port-forward -n dev svc/wil-playground-service 8888:8888
+```
+
+**Retrieve ArgoCD Admin Password:**
+Username: `admin`
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+    -o jsonpath="{.data.password}" | base64 -d && echo
+```
