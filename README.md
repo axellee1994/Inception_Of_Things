@@ -145,14 +145,9 @@ kubectl get pods -A
 ### Port Forwarding & Access
 
 **ArgoCD (http://localhost:8080):**
-```bash
-kubectl port-forward -n argocd svc/argocd-server 8080:443
-```
 
 **Application (http://localhost:8888):**
-```bash
-kubectl port-forward -n dev svc/wil-playground-service 8888:8888
-```
+
 
 **Retrieve ArgoCD Admin Password:**
 Username: `admin`
