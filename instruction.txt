@@ -64,13 +64,14 @@ p3:
     kubectl get pods -n dev
     kubectl get pods -A
     
-    Port forward from localhost:
+    Argo url: http://localhost:8080
+    app  url: http://localhost:8888
     
-    argocd
-        kubectl port-forward -n argocd svc/argocd-server 8080:443
-
-    app
-        kubectl port-forward -n dev svc/wil-playground-service 8888:8888
+    #Port forward from localhost:
+    #argocd
+    #    kubectl port-forward -n argocd svc/argocd-server 8080:443
+    #app
+    #    kubectl port-forward -n dev svc/wil-playground-service 8888:8888
 
     Generate Argo cd admin login password (http://localhost:8080)
         
